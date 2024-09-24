@@ -1,9 +1,13 @@
-FROM jrottenberg/ffmpeg:4.4-alpine
+FROM node:latest
+
+RUN apt-get update && apt-get install -y ffmpeg
 
 WORKDIR /app
 
 COPY . .
 
-RUN chmod +x compress.sh
+RUN npm install -g pnpm
 
-CMD ["./compress.sh"]
+RUN pnpm install
+
+CMD ["npm", "run", "start"]
