@@ -41,6 +41,9 @@ app.post("/compress", async (req: Request<{}, {}, UploadRequestBody>, res) => {
     const __filename = new URL(import.meta.url).pathname;
     const __dirname = path.dirname(__filename);
 
+    const tmpDir = path.join(__dirname, '..', 'tmp');
+    await fs.promises.mkdir(tmpDir, { recursive: true });
+
     const buffer = Buffer.from(await response.arrayBuffer());
     const filePath = path.join(__dirname, '..', 'tmp', `${name}.mp3`);
 
