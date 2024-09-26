@@ -58,13 +58,24 @@ app.post("/compress", async (req: Request<{}, {}, UploadRequestBody>, res) => {
       }
 
       const file = new File([await fs.promises.readFile(outputFilePath)], `${name}.ogg`, { type: 'audio/ogg' });
-      const uploadResponse = await utapi.uploadFiles([file])
+      const [utFile] = await utapi.uploadFiles([file])
+
+      if (utFile.error) {
+        return res.status(500).send({ success: false, error: utFile.error });
+      }
 
       await fs.promises.unlink(filePath);
       await fs.promises.unlink(outputFilePath);
-      await utapi.deleteFiles(req.body.key);
 
-      res.status(200).send({ success: true, outputFile: uploadResponse });
+      res.status(200).send({
+        success: true, outputFile: {
+          name: utFile.data.name,
+          url: utFile.data.url,
+          key: utFile.data.key,
+          type: utFile.data.type,
+          size: utFile.data.size,
+        }
+      });
     });
   } catch (error) {
     console.log(error)
